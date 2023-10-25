@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ruby</title>
+    <style>
+        .tweet-card {
+        margin: 10px 0;
+        padding: 20px;
+        border: 1px solid #3498db;
+        border-radius: 10px;
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+        .tweet-card-content {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .tweet-card-hashtag {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        #output ul {
+        list-style-type: none;
+        padding-left: 0;
+}
+
+        #output li {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+}
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+        }
+        h1 {
+            color: #3498db;
+        }
+        #contentBox {
+            width: 80%;
+            height: 200px;
+            margin: 20px auto;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+            color: #333;
+        }
+        #submitButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #submitButton:hover {
+            background-color: #2980b9;
+        }
+        #output {
+            margin-top: 20px;
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+            color: #333;
+            display: none;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>For Ruby</h1>
+    <p>Enter a link below and press the button to convert it into engaging content.</p>
+    <textarea id="contentBox" placeholder="Enter your content here..."></textarea>
+    <br>
+    <button id="submitButton" onclick="submitContent()">Submit</button>
+    <div id="output"></div>
+
+    <script>
+async function submitContent() {
+    var contentBox = document.getElementById("contentBox");
+    var outputDiv = document.getElementById("output");
+
+    try {
+        const response = await fetch('/generate-tweets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: contentBox.value })
+        });
+        const data = await response.json();
+        
+        // This line will format the tweets
+        displayTweetStorm(data.tweetStorm);
+        
+        outputDiv.style.display = "block";
+    } catch (error) {
+        console.error('Error:', error);
+        outputDiv.innerHTML = "Error generating tweet storm.";
+        outputDiv.style.display = "block";
+    }
+}
+
+function displayTweetStorm(tweetStorm) {
+    var tweets = tweetStorm.split(/\d+\/ /);
+    var outputHtml = '';
+    var tweetCount = 0;
+
+    for (var tweet of tweets) {
+        if (tweet.trim() !== '') {
+            tweetCount++;
+            const content = tweet.replace(/#\w+/g, '').trim();  // Extract main content without hashtags
+            outputHtml += `Tweet ${tweetCount}/${tweets.length - 1}: ${content}<br><br>`;
+        }
+    }
+    
+    document.getElementById("output").innerHTML = outputHtml;
+}
+
+    </script>
+</body>
+</html>
